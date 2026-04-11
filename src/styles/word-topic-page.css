@@ -1,0 +1,132 @@
+/* 단어 주제 선택 페이지 · 임시 학습 페이지 공통 레이아웃 */
+
+.word-topic-page {
+  flex: 1;
+  background: linear-gradient(160deg, #f1f8e9 0%, #e8f5e9 40%, #fff 100%);
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.word-topic-page__inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.word-topic-page__crumb {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: #546e7a;
+}
+
+.word-topic-page__crumb a {
+  color: #2e7d32;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.word-topic-page__crumb a:hover {
+  text-decoration: underline;
+}
+
+.word-topic-page__crumb-current {
+  color: #37474f;
+  font-weight: 600;
+}
+
+.word-topic-page__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 800;
+  color: #1b5e20;
+  letter-spacing: -0.02em;
+}
+
+.word-topic-page__lead {
+  margin: 0 0 2rem;
+  font-size: 0.95rem;
+  color: #455a64;
+  line-height: 1.6;
+  max-width: 36em;
+}
+
+/* 반응형 정사각형 타일 그리드 */
+.word-topic-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
+  gap: 1rem;
+}
+
+.word-topic-grid__cell {
+  margin: 0;
+}
+
+.word-topic-card {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.word-topic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(46, 125, 50, 0.15);
+  border-color: rgba(46, 125, 50, 0.45);
+}
+
+.word-topic-card:focus-visible {
+  outline: 3px solid #66bb6a;
+  outline-offset: 2px;
+}
+
+.word-topic-card__title {
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  font-weight: 800;
+  color: #1b5e20;
+  margin-bottom: 0.35rem;
+}
+
+.word-topic-card__hint {
+  font-size: 0.72rem;
+  color: #607d8b;
+  line-height: 1.35;
+  max-width: 11em;
+}
+
+/* 임시 학습 페이지 */
+.word-study-placeholder__msg {
+  margin: 0 0 1.5rem;
+  color: #546e7a;
+  font-size: 1rem;
+}
+
+.word-study-placeholder__back {
+  display: inline-block;
+  color: #2e7d32;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.word-study-placeholder__back:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+  .word-topic-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

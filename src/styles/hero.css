@@ -1,0 +1,297 @@
+/* ------------------------------------------------------------------
+   노어스쿨 — 히어로(섹션 1) 스타일 (React에서 import)
+   빌드 후: Spring Boot 가 static 하위 에셋과 함께 서빙합니다.
+   ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    "Pretendard Variable",
+    Pretendard,
+    "Malgun Gothic",
+    "Apple SD Gothic Neo",
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+  color: #2d3436;
+  background: #fff;
+}
+
+#root,
+#wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Header (흰 배경 바) ---------- */
+.site-header {
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #1b5e20;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  flex-wrap: wrap;
+}
+
+.header-nav a {
+  color: #546e7a;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.header-nav a:hover {
+  color: #1b5e20;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.link-login {
+  color: #546e7a;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-header-signup {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.btn-header-signup:hover {
+  background: #c8e6c9;
+}
+
+/* ---------- Section 1: 히어로 그라데이션 ---------- */
+.section.s1 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(90deg, #e8f5e9 0%, #dcedc8 45%, #c5e1a5 100%);
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+.section-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+  color: #455a64;
+  font-weight: 600;
+  max-width: 42em;
+}
+
+.title2 {
+  margin: 0 0 2rem;
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  font-weight: 800;
+  color: #263238;
+  line-height: 1.35;
+  max-width: 22em;
+}
+
+.section-img {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
+  margin-bottom: 2.25rem;
+}
+
+.section-img-item.tile {
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+a.section-img-item.tile {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.section-img-item.tile:hover {
+  transform: translateY(-4px) rotate(0deg) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.tile-label {
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+.section-img-item[data-type="word"] {
+  background: #43a047;
+  transform: rotate(-4deg);
+}
+
+.section-img-item[data-type="sentence"] {
+  background: #ffb300;
+  transform: rotate(5deg);
+}
+
+.section-img-item[data-type="drill"] {
+  background: #1e88e5;
+  transform: rotate(-3deg);
+}
+
+.section-img-item[data-type="grammar"] {
+  background: #00acc1;
+  transform: rotate(4deg);
+}
+
+.section-img-item[data-type="listen"] {
+  background: #8e24aa;
+  transform: rotate(-5deg);
+}
+
+.btn-body {
+  margin-top: auto;
+}
+
+.pos-relative.dp-inline-block {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font: inherit;
+}
+
+.btn-top-member-reg {
+  background: linear-gradient(180deg, #7e57c2 0%, #5e35b1 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  padding: 0.85rem 1.75rem;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(94, 53, 177, 0.35);
+}
+
+.btn-top-member-reg:hover {
+  filter: brightness(1.05);
+}
+
+.youtube {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #37474f;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.youtube:hover {
+  color: #1b5e20;
+}
+
+.youtube-icon {
+  display: inline-block;
+  width: 22px;
+  height: 16px;
+  background: #e53935;
+  border-radius: 3px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.youtube-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-40%, -50%);
+  border-style: solid;
+  border-width: 4px 0 4px 7px;
+  border-color: transparent transparent transparent #fff;
+}
+
+@media (max-width: 600px) {
+  .header-inner {
+    justify-content: center;
+  }
+
+  .header-nav {
+    justify-content: center;
+  }
+
+  .section-img-item.tile {
+    width: 5.75rem;
+    height: 5.75rem;
+  }
+
+  .tile-label {
+    font-size: 1rem;
+  }
+}
