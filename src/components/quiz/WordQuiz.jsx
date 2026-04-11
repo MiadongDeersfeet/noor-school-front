@@ -1,45 +1,114 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getQuestionsForTopic } from "../../data/mockWordQuiz.js";
+import {
+  fetchRandomQuizSet,
+  submitWordQuizAnswer,
+} from "../../api/wordQuizApi.js";
 import "../../styles/word-quiz.css";
 
 /** 보기 버튼 왼쪽에 붙는 번호 라벨 (1·2·3) */
 const CHOICE_LABELS = ["1", "2", "3"];
 
 /**
+ * API 랜덤 퀴즈 한 문항을 UI용 형태로 변환합니다.
+ * @param {object} q
+ */
+function mapQuizDtoToQuestion(q) {
+  const choices = (q.options ?? []).map((text, i) => ({
+    id: String(i),
+    text,
+  }));
+  return {
+    id: String(q.wordId),
+    wordId: q.wordId,
+    arabic: q.question,
+    prompt: "이 아랍어에 맞는 한국어는?",
+    choices,
+  };
+}
+
+/**
  * 단어 퀴즈 화면 (아랍어 단어 → 한국어 뜻 3지선다)
  *
- * - 어디서 쓰나요?
- *   `/words/study/:topicId` 에서 주제만 바꿔 같은 UI를 재사용합니다.
- *
- * - 데이터는 어디서 오나요?
- *   지금은 `getQuestionsForTopic(topicId)` 로 목(mock) 데이터를 가져옵니다.
- *   나중에 REST API를 쓰면 이 함수만 `fetch` 호출로 바꾸면 되고, 이 컴포넌트 구조는 그대로 두면 됩니다.
- *
- * @param {string} topicId   URL 파라미터와 같은 주제 ID (예: "daily", "travel")
- * @param {string} topicTitle 상단에 보여 줄 주제 이름 (예: "일상 회화")
+ * @param {string} topicId   URL 파라미터와 같은 주제 ID (예: "daily", "random")
+ * @param {string} topicTitle 상단에 보여 줄 주제 이름
+ * @param {"mock" | "api"} mode mock: 목 데이터, api: GET /quizzes/random + POST /quizzes/submit
  */
-export default function WordQuiz({ topicId, topicTitle }) {
-  // 주제가 바뀔 때만 문제 목록을 다시 계산합니다.
-  const questions = useMemo(() => getQuestionsForTopic(topicId), [topicId]);
+export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
+  const mockQuestions = useMemo(
+    () => (mode === "mock" ? getQuestionsForTopic(topicId) : []),
+    [mode, topicId]
+  );
+
+  const [apiQuestions, setApiQuestions] = useState([]);
+  const [loadState, setLoadState] = useState(
+    mode === "api" ? "loading" : "idle"
+  );
+  const [loadError, setLoadError] = useState(null);
+
+  useEffect(() => {
+    if (mode !== "api") {
+      setApiQuestions([]);
+      setLoadState("idle");
+      setLoadError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadState("loading");
+    setLoadError(null);
+
+    (async () => {
+      try {
+        const dto = await fetchRandomQuizSet();
+        if (cancelled) return;
+        const mapped = (dto.quizzes ?? []).map(mapQuizDtoToQuestion);
+        if (!mapped.length) {
+          setLoadState("error");
+          setLoadError("출제할 단어가 없습니다.");
+          setApiQuestions([]);
+          return;
+        }
+        setApiQuestions(mapped);
+        setLoadState("idle");
+      } catch (e) {
+        if (!cancelled) {
+          setLoadState("error");
+          setLoadError(e instanceof Error ? e.message : "퀴즈를 불러오지 못했습니다.");
+          setApiQuestions([]);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, topicId]);
+
+  const questions = mode === "api" ? apiQuestions : mockQuestions;
   const total = questions.length;
 
-  // --- 퀴즈 진행 상태 ---
-  /** 지금 몇 번째 문제인지 (0부터 시작) */
   const [index, setIndex] = useState(0);
-  /** 사용자가 고른 보기 ID (아직 고르지 않았으면 null) */
   const [selectedId, setSelectedId] = useState(null);
-  /** 한 문제에서 답을 고른 뒤에는 true → 보기를 더 누를 수 없게 막습니다 */
   const [locked, setLocked] = useState(false);
-  /** 지금 세션에서 맞힌 개수 */
   const [score, setScore] = useState(0);
-  /** 마지막 문제까지 끝났는지 → true면 결과 화면으로 갑니다 */
   const [sessionDone, setSessionDone] = useState(false);
+  /** api 모드: 채점 API 응답 */
+  const [submitResult, setSubmitResult] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const question = questions[index];
 
-  /** 보기 하나를 눌렀을 때: 정답이면 점수 +1, 그리고 잠금 */
-  const pickChoice = useCallback(
+  const resetQuestionUi = useCallback(() => {
+    setSelectedId(null);
+    setLocked(false);
+    setSubmitResult(null);
+    setSubmitError(null);
+  }, []);
+
+  const pickChoiceMock = useCallback(
     (choiceId) => {
       if (locked || !question) return;
       setSelectedId(choiceId);
@@ -51,18 +120,156 @@ export default function WordQuiz({ topicId, topicTitle }) {
     [locked, question]
   );
 
-  /** '다음 문제' / '결과 보기': 마지막이면 세션 종료, 아니면 다음 문항으로 */
+  const pickChoiceApi = useCallback(
+    async (choiceId) => {
+      if (locked || submitting || !question || !question.wordId) return;
+      const choice = question.choices.find((c) => c.id === choiceId);
+      if (!choice) return;
+
+      setSubmitError(null);
+      setSubmitting(true);
+      setSelectedId(choiceId);
+
+      try {
+        const result = await submitWordQuizAnswer(
+          question.wordId,
+          choice.text
+        );
+        setSubmitResult(result);
+        setLocked(true);
+        if (result.correct) {
+          setScore((s) => s + 1);
+        }
+      } catch (e) {
+        setSelectedId(null);
+        setSubmitError(
+          e instanceof Error ? e.message : "채점 요청에 실패했습니다."
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [locked, submitting, question]
+  );
+
+  const pickChoice = useCallback(
+    (choiceId) => {
+      if (mode === "api") {
+        void pickChoiceApi(choiceId);
+        return;
+      }
+      pickChoiceMock(choiceId);
+    },
+    [mode, pickChoiceApi, pickChoiceMock]
+  );
+
   const goNext = useCallback(() => {
     if (index >= total - 1) {
       setSessionDone(true);
       return;
     }
     setIndex((i) => i + 1);
-    setSelectedId(null);
-    setLocked(false);
-  }, [index, total]);
+    resetQuestionUi();
+  }, [index, total, resetQuestionUi]);
 
-  // 문항이 하나도 없거나, 퀴즈를 모두 끝낸 경우 → 완료(결과) 화면
+  const retryLoad = useCallback(() => {
+    setLoadState("loading");
+    setLoadError(null);
+    (async () => {
+      try {
+        const dto = await fetchRandomQuizSet();
+        const mapped = (dto.quizzes ?? []).map(mapQuizDtoToQuestion);
+        if (!mapped.length) {
+          setLoadState("error");
+          setLoadError("출제할 단어가 없습니다.");
+          setApiQuestions([]);
+          return;
+        }
+        setApiQuestions(mapped);
+        setLoadState("idle");
+        setIndex(0);
+        setScore(0);
+        setSessionDone(false);
+        resetQuestionUi();
+      } catch (e) {
+        setLoadState("error");
+        setLoadError(
+          e instanceof Error ? e.message : "퀴즈를 불러오지 못했습니다."
+        );
+      }
+    })();
+  }, [resetQuestionUi]);
+
+  /** 완료 화면에서: API는 새 세트 요청, mock 은 같은 문항으로 세션만 리셋 */
+  const restartMockSession = useCallback(() => {
+    setIndex(0);
+    setScore(0);
+    setSessionDone(false);
+    resetQuestionUi();
+  }, [resetQuestionUi]);
+
+  const handleRequestNewQuiz = useCallback(() => {
+    if (mode === "api") {
+      retryLoad();
+    } else {
+      restartMockSession();
+    }
+  }, [mode, retryLoad, restartMockSession]);
+
+  if (mode === "api" && loadState === "loading") {
+    return (
+      <div className="word-quiz word-quiz--loading">
+        <div className="word-quiz__top">
+          <Link
+            to="/words/topics"
+            className="word-quiz__back"
+            aria-label="주제 목록으로"
+          >
+            ←
+          </Link>
+          <span className="word-quiz__topic">{topicTitle}</span>
+          <span className="word-quiz__top-spacer" aria-hidden="true" />
+        </div>
+        <p className="word-quiz__loading-msg" role="status">
+          랜덤 퀴즈를 불러오는 중…
+        </p>
+      </div>
+    );
+  }
+
+  if (mode === "api" && loadState === "error") {
+    return (
+      <div className="word-quiz word-quiz--error">
+        <div className="word-quiz__top">
+          <Link
+            to="/words/topics"
+            className="word-quiz__back"
+            aria-label="주제 목록으로"
+          >
+            ←
+          </Link>
+          <span className="word-quiz__topic">{topicTitle}</span>
+          <span className="word-quiz__top-spacer" aria-hidden="true" />
+        </div>
+        <div className="word-quiz-error">
+          <p className="word-quiz-error__msg">{loadError}</p>
+          <div className="word-quiz-error__actions">
+            <button
+              type="button"
+              className="word-quiz__btn-next"
+              onClick={retryLoad}
+            >
+              다시 시도
+            </button>
+            <Link to="/words/topics" className="word-quiz-error__link">
+              주제 목록
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (sessionDone || total === 0) {
     const finalScore = sessionDone ? score : 0;
     const max = total || 1;
@@ -78,7 +285,6 @@ export default function WordQuiz({ topicId, topicTitle }) {
             ←
           </Link>
           <span className="word-quiz__topic">{topicTitle}</span>
-          {/* 오른쪽 진행 막대 자리 맞추기용(빈 공간) */}
           <span className="word-quiz__top-spacer" aria-hidden="true" />
         </div>
         <div className="word-quiz-complete">
@@ -96,10 +302,18 @@ export default function WordQuiz({ topicId, topicTitle }) {
             {finalScore} / {max} 정답
           </p>
           <p className="word-quiz-complete__msg">
-            아랍어 단어와 한국어 뜻을 연결하는 감각이 조금씩 쌓이고 있어요.
-            API가 연결되면 이 화면은 같은 UI로 실제 문제만 바뀝니다.
+            {mode === "api"
+              ? "서버에서 출제한 랜덤 단어로 연습했어요."
+              : "아랍어 단어와 한국어 뜻을 연결하는 감각이 조금씩 쌓이고 있어요."}
           </p>
           <div className="word-quiz-complete__actions">
+            <button
+              type="button"
+              className="word-quiz-complete__btn word-quiz-complete__btn--secondary"
+              onClick={handleRequestNewQuiz}
+            >
+              {mode === "api" ? "새 랜덤 퀴즈 받기" : "이 주제 다시 풀기"}
+            </button>
             <Link
               to="/words/topics"
               className="word-quiz-complete__btn word-quiz-complete__btn--primary"
@@ -115,27 +329,40 @@ export default function WordQuiz({ topicId, topicTitle }) {
     );
   }
 
-  // 진행 막대: "지금까지 풀어 온 비율" 느낌으로 (현재 문항 번호 기준)
   const progressPct = ((index + 1) / total) * 100;
-  /** 답을 고른 뒤에만 '다음' 버튼 활성화 */
-  const showNext = locked;
+  const showNext =
+    mode === "api" ? locked && !submitting && submitResult : locked;
 
-  /**
-   * 보기 버튼에 붙일 className
-   * - 고르기 전: 선택 강조만
-   * - 고른 뒤: 정답은 초록, 내가 고른 오답은 빨강, 나머지는 비활성 느낌
-   */
   const choiceClass = (choiceId) => {
     const base = "word-quiz__choice";
     if (!locked) {
       return `${base}${selectedId === choiceId ? " word-quiz__choice--selected" : ""}`;
     }
+
+    if (mode === "api" && submitResult) {
+      const ch = question.choices.find((c) => c.id === choiceId);
+      if (!ch) return base;
+      const isCorrectChoice = ch.text === submitResult.correctAnswer;
+      const isPicked = choiceId === selectedId;
+      if (isCorrectChoice)
+        return `${base} word-quiz__choice--locked word-quiz__choice--correct`;
+      if (isPicked && !submitResult.correct)
+        return `${base} word-quiz__choice--locked word-quiz__choice--wrong`;
+      return `${base} word-quiz__choice--locked`;
+    }
+
     const isCorrect = choiceId === question.correctId;
     const isPicked = choiceId === selectedId;
     if (isCorrect) return `${base} word-quiz__choice--locked word-quiz__choice--correct`;
-    if (isPicked && !isCorrect) return `${base} word-quiz__choice--locked word-quiz__choice--wrong`;
+    if (isPicked && !isCorrect)
+      return `${base} word-quiz__choice--locked word-quiz__choice--wrong`;
     return `${base} word-quiz__choice--locked`;
   };
+
+  const feedbackOk =
+    mode === "api" && submitResult
+      ? submitResult.correct
+      : selectedId === question.correctId;
 
   return (
     <div className="word-quiz">
@@ -168,7 +395,6 @@ export default function WordQuiz({ topicId, topicTitle }) {
       </header>
 
       <div className="word-quiz__body">
-        {/* key={question.id} → 문항이 바뀔 때 카드 애니메이션이 자연스럽게 다시 돕니다 */}
         <article className="word-quiz__card" key={question.id}>
           <p className="word-quiz__prompt">{question.prompt}</p>
           <div className="word-quiz__arabic-wrap">
@@ -184,7 +410,7 @@ export default function WordQuiz({ topicId, topicTitle }) {
                 type="button"
                 className={choiceClass(c.id)}
                 onClick={() => pickChoice(c.id)}
-                disabled={locked}
+                disabled={locked || submitting}
               >
                 <span className="word-quiz__choice-num">{CHOICE_LABELS[i]}</span>
                 {c.text}
@@ -192,12 +418,29 @@ export default function WordQuiz({ topicId, topicTitle }) {
             ))}
           </div>
 
-          {locked && (
+          {submitError && (
+            <p className="word-quiz__submit-err" role="alert">
+              {submitError}
+            </p>
+          )}
+
+          {locked && mode === "api" && submitResult && (
             <div
-              className={`word-quiz__feedback ${selectedId === question.correctId ? "word-quiz__feedback--ok" : "word-quiz__feedback--bad"}`}
+              className={`word-quiz__feedback ${feedbackOk ? "word-quiz__feedback--ok" : "word-quiz__feedback--bad"}`}
               role="status"
             >
-              {selectedId === question.correctId
+              {feedbackOk
+                ? "정답이에요! 잘하고 있어요."
+                : `아쉽네요. 정답은 「${submitResult.correctAnswer}」이에요.`}
+            </div>
+          )}
+
+          {locked && mode === "mock" && (
+            <div
+              className={`word-quiz__feedback ${feedbackOk ? "word-quiz__feedback--ok" : "word-quiz__feedback--bad"}`}
+              role="status"
+            >
+              {feedbackOk
                 ? "정답이에요! 잘하고 있어요."
                 : "아쉽네요. 초록색이 정답이에요."}
             </div>

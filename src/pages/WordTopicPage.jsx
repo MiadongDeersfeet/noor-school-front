@@ -2,8 +2,13 @@ import { Link } from "react-router-dom";
 import SiteHeader from "../components/SiteHeader.jsx";
 import "../styles/word-topic-page.css";
 
-/** 단어 학습 주제 — 이후 API·DB와 id 매핑 가능 */
+/** 단어 학습 주제 — `random` 은 백엔드 GET /api/quizzes/random 과 연동 */
 export const WORD_TOPIC_ITEMS = [
+  {
+    id: "random",
+    title: "랜덤 퀴즈",
+    hint: "전체 단어에서 무작위 출제 · 서버 연동",
+  },
   { id: "daily", title: "일상 회화", hint: "인사·취미·하루 일과" },
   { id: "travel", title: "여행", hint: "공항·숙소·길 찾기" },
   { id: "food", title: "음식", hint: "메뉴·주문·맛 표현" },
@@ -40,7 +45,11 @@ export default function WordTopicPage() {
               <li key={id} className="word-topic-grid__cell" role="listitem">
                 <Link
                   to={`/words/study/${id}`}
-                  className="word-topic-card"
+                  className={
+                    id === "random"
+                      ? "word-topic-card word-topic-card--random"
+                      : "word-topic-card"
+                  }
                 >
                   <span className="word-topic-card__title">{title}</span>
                   <span className="word-topic-card__hint">{hint}</span>

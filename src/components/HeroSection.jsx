@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
+import LearningSheep from "./LearningSheep.jsx";
 
 /**
- * 섹션 1 (히어로): 타일 데이터는 API/번들로 분리하기 쉽게 상수 배열로 둡니다.
- * 이미지로 교체 시: 아래 map 안을 <img className="section-img-item" data-type={...} /> 로 바꾸면 됩니다.
+ * 섹션 1 (히어로): 학습 단위 타일 — 귀여운 양 캐릭터 + 라벨
  */
 const LEARNING_TILES = [
   { dataType: "word", label: "단어" },
-  { dataType: "sentence", label: "문장" },
-  { dataType: "drill", label: "드릴" },
-  { dataType: "grammar", label: "문법" },
-  { dataType: "listen", label: "듣기" },
+  { dataType: "sentence", label: "" },
+  { dataType: "drill", label: "" },
+  { dataType: "grammar", label: "" },
+  { dataType: "listen", label: "" },
 ];
 
 export default function HeroSection() {
@@ -17,36 +17,41 @@ export default function HeroSection() {
     <section className="section s1" id="hero" aria-labelledby="hero-title">
       <div className="section-inner">
         <p className="title1" id="hero-kicker">
-          대한민국과 아랍 사이에 다리를 놓는 사람들
+          대한민국과 아랍 사이에 다리 놓기
         </p>
         <h1 className="title2" id="hero-title">
-          한국어 교육으로 아랍을 밝히자
+          아랍인 대상 한국어 학습 도우미
         </h1>
 
         <div className="section-img" role="list" aria-label="학습 단위">
           {LEARNING_TILES.map(({ dataType, label }) => {
-            const labelEl = <span className="tile-label">{label}</span>;
+            const sheep = (
+              <span className="section-img-figure">
+                <LearningSheep label={label} />
+              </span>
+            );
             if (dataType === "word") {
               return (
                 <Link
                   key={dataType}
                   to="/words/topics"
-                  className="section-img-item tile"
+                  className="section-img-item section-img-item--sheep"
                   data-type={dataType}
                   role="listitem"
+                  aria-label={`${label} 학습으로 이동`}
                 >
-                  {labelEl}
+                  {sheep}
                 </Link>
               );
             }
             return (
               <div
                 key={dataType}
-                className="section-img-item tile"
+                className="section-img-item section-img-item--sheep"
                 data-type={dataType}
                 role="listitem"
               >
-                {labelEl}
+                {sheep}
               </div>
             );
           })}

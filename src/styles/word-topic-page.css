@@ -107,6 +107,16 @@
   max-width: 11em;
 }
 
+/* 랜덤 퀴즈 — 주제 목록에서 구분 */
+.word-topic-card--random {
+  background: linear-gradient(145deg, #e8f5e9 0%, #fff 55%, #f1f8e9 100%);
+  border-color: rgba(27, 94, 32, 0.35);
+}
+
+.word-topic-card--random .word-topic-card__title {
+  color: #0d47a1;
+}
+
 /* 임시 학습 페이지 */
 .word-study-placeholder__msg {
   margin: 0 0 1.5rem;

@@ -106,10 +106,12 @@ body {
 
 /* ---------- Section 1: 히어로 그라데이션 ---------- */
 .section.s1 {
+  /* 양 히어로 에셋의 민트 톤(#eaf2e9 계열)과 맞춤 */
+  --hero-gradient: linear-gradient(90deg, #eaf2e9 0%, #e8f5e9 28%, #dcedc8 55%, #c5e1a5 100%);
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(90deg, #e8f5e9 0%, #dcedc8 45%, #c5e1a5 100%);
+  background: var(--hero-gradient);
   padding: 2.5rem 1.25rem 3rem;
 }
 
@@ -143,68 +145,122 @@ body {
 .section-img {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem 1.25rem;
-  margin-bottom: 2.25rem;
+  gap: 1.5rem 1.75rem;
+  margin-bottom: 2.5rem;
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.section-img-item.tile {
-  width: 6.5rem;
-  height: 6.5rem;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
+/* 측면 양 캐릭터만 — 사각형 카드 없음 */
+.section-img-item--sheep {
+  --sheep-tilt: 0deg;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  color: #fff;
-  font-weight: 800;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  transform: rotate(var(--sheep-tilt));
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-a.section-img-item.tile {
+.section-img-item--sheep[data-type="word"] {
+  --sheep-tilt: -3deg;
+}
+
+.section-img-item--sheep[data-type="sentence"] {
+  --sheep-tilt: 3deg;
+}
+
+.section-img-item--sheep[data-type="drill"] {
+  --sheep-tilt: -2deg;
+}
+
+.section-img-item--sheep[data-type="grammar"] {
+  --sheep-tilt: 2.5deg;
+}
+
+.section-img-item--sheep[data-type="listen"] {
+  --sheep-tilt: -2.5deg;
+}
+
+/* 클래스 카드 썸네일 느낌 — 큰 카드 그리드 */
+.section-img-figure {
+  display: block;
+  width: clamp(10.5rem, 24vw, 13.5rem);
+  aspect-ratio: 1024 / 682;
+  flex-shrink: 0;
+}
+
+/* 에셋 배경(연민트 단색)과 여백 톤 일치 */
+.learning-sheep-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #eaf2e9;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 14px 32px rgba(46, 125, 50, 0.14),
+    0 0 0 1px rgba(46, 125, 50, 0.06);
+  transition: box-shadow 0.25s ease;
+}
+
+.learning-sheep-photo__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  vertical-align: top;
+}
+
+/* 흰 양 몸통 중앙(가로형 1024×682 기준, 3D 측면 일러스트) */
+.learning-sheep-photo__label {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: 42%;
+  min-width: 2.75rem;
+  max-width: 4.5rem;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.8rem, 2.1vw, 1.05rem);
+  font-weight: 800;
+  color: #1b5e20;
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+}
+
+a.section-img-item--sheep {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
 }
 
-.section-img-item.tile:hover {
-  transform: translateY(-4px) rotate(0deg) !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+.section-img-item--sheep:hover {
+  transform: translateY(-5px) rotate(var(--sheep-tilt));
 }
 
-.tile-label {
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
-}
-
-.section-img-item[data-type="word"] {
-  background: #43a047;
-  transform: rotate(-4deg);
-}
-
-.section-img-item[data-type="sentence"] {
-  background: #ffb300;
-  transform: rotate(5deg);
-}
-
-.section-img-item[data-type="drill"] {
-  background: #1e88e5;
-  transform: rotate(-3deg);
-}
-
-.section-img-item[data-type="grammar"] {
-  background: #00acc1;
-  transform: rotate(4deg);
-}
-
-.section-img-item[data-type="listen"] {
-  background: #8e24aa;
-  transform: rotate(-5deg);
+.section-img-item--sheep:hover .learning-sheep-photo {
+  box-shadow:
+    0 10px 16px rgba(0, 0, 0, 0.07),
+    0 22px 44px rgba(46, 125, 50, 0.2),
+    0 0 0 1px rgba(46, 125, 50, 0.1);
 }
 
 .btn-body {
@@ -286,12 +342,11 @@ a.section-img-item.tile {
     justify-content: center;
   }
 
-  .section-img-item.tile {
-    width: 5.75rem;
-    height: 5.75rem;
+  .section-img {
+    gap: 1.15rem 1.25rem;
   }
 
-  .tile-label {
-    font-size: 1rem;
+  .section-img-figure {
+    width: clamp(8.5rem, 44vw, 11rem);
   }
 }
