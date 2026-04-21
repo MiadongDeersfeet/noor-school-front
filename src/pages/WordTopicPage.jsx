@@ -23,8 +23,10 @@ export default function WordTopicPage() {
   return (
     <>
       <SiteHeader />
+      {/* 주제 카드 목록: 선택한 주제로 퀴즈 페이지로 이동 */}
       <main className="word-topic-page" aria-labelledby="word-topic-heading">
         <div className="word-topic-page__inner">
+          {/* 간단한 위치 표시(브레드크럼) */}
           <p className="word-topic-page__crumb">
             <Link to="/">홈</Link>
             <span aria-hidden="true"> / </span>
@@ -43,6 +45,7 @@ export default function WordTopicPage() {
           <ul className="word-topic-grid" role="list">
             {WORD_TOPIC_ITEMS.map(({ id, title, hint }) => (
               <li key={id} className="word-topic-grid__cell" role="listitem">
+                {/* topic id를 URL에 넣어 공통 퀴즈 컴포넌트를 재사용 */}
                 <Link
                   to={`/words/study/${id}`}
                   className={

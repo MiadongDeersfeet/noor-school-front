@@ -4,7 +4,10 @@ import WordTopicPage from "./pages/WordTopicPage.jsx";
 import WordQuizPage from "./pages/WordQuizPage.jsx";
 
 /**
- * 루트 레이아웃: #wrap 아래 라우트.
+ * 앱의 라우팅 허브입니다.
+ * - "/"                 : 랜딩(홈)
+ * - "/words/topics"     : 단어 주제 목록
+ * - "/words/study/:id"  : 주제별 퀴즈
  */
 export default function App() {
   return (

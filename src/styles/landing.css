@@ -1,0 +1,139 @@
+/* 랜딩 페이지 전체 배경/레이아웃 */
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+}
+
+/* 카드가 화면 중앙에 오도록 메인 영역 정렬 */
+.landing-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 60px 20px 48px;
+  background-color: #f8fafc;
+}
+
+/* 핵심 메시지 + CTA를 담는 메인 카드 */
+.landing-content {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 52px 44px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+/* 메인 카피 (첫 시선이 닿는 텍스트) */
+.landing-title {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* 보조 설명 문구 */
+.landing-subtitle {
+  margin: 0;
+  font-size: 16px;
+  color: #666666;
+  text-align: center;
+}
+
+/* Google 공식 버튼을 감싸는 강조 래퍼 */
+.landing-google-cta {
+  margin-top: 36px;
+  width: 320px;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  transform: scale(1.2);
+  transform-origin: center;
+  transition: all 0.2s ease;
+}
+
+.landing-google-cta:hover {
+  transform: scale(1.25);
+}
+
+/* GIS가 버튼을 실제로 렌더링하는 자리 */
+.landing-google-wrap {
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 설정 누락/스크립트 실패 안내 */
+.landing-google-error {
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  color: #b91c1c;
+}
+
+/* 개인정보 동의 안내 */
+.landing-policy {
+  margin: 18px 0 0;
+  color: #888888;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* 정책 링크 강조 */
+.landing-policy-link {
+  color: #374151;
+  text-decoration: underline;
+}
+
+/* 랜딩 하단 푸터 */
+.site-footer {
+  border-top: 1px solid #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.site-footer__inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  flex-wrap: wrap;
+}
+
+.site-footer__copy {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.site-footer__links {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.site-footer__links a {
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.site-footer__links a:hover {
+  text-decoration: underline;
+}

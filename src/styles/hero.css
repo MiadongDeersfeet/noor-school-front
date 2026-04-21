@@ -37,6 +37,8 @@ body {
 /* ---------- Header (흰 배경 바) ---------- */
 .site-header {
   flex-shrink: 0;
+  /* RTL 문맥에서 헤더 시작점이 오른쪽이 되도록 고정 */
+  direction: rtl;
   background: #fff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
@@ -45,20 +47,27 @@ body {
 .header-inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0.25rem 1.25rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* rtl + flex-start 조합 = 시각적으로 오른쪽 정렬 */
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 0.75rem 1rem;
 }
 
 .brand {
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: #1b5e20;
+  display: inline-flex;
+  align-items: center;
+  height: 8rem;
   text-decoration: none;
-  letter-spacing: 0.02em;
+}
+
+.brand-logo {
+  display: block;
+  /* 부모(.brand) 높이를 꽉 채워 비율 유지 */
+  height: 100%;
+  width: auto;
 }
 
 .header-nav {
@@ -334,8 +343,12 @@ a.section-img-item--sheep {
 }
 
 @media (max-width: 600px) {
+  .brand {
+    height: 6.4rem;
+  }
+
   .header-inner {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .header-nav {
