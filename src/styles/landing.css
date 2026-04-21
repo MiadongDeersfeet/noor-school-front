@@ -1,6 +1,7 @@
 /* 랜딩 페이지 전체 배경/레이아웃 */
 .landing-page {
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   background-color: #f8fafc;
@@ -14,7 +15,7 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 60px 20px 48px;
+  padding: 60px 20px calc(48px + env(safe-area-inset-bottom));
   background-color: #f8fafc;
 }
 
@@ -38,7 +39,7 @@
 /* 메인 카피 (첫 시선이 닿는 텍스트) */
 .landing-title {
   margin: 0;
-  font-size: 38px;
+  font-size: clamp(2rem, 5vw, 2.375rem);
   font-weight: 700;
   color: #111827;
   line-height: 1.5;
@@ -60,13 +61,15 @@
   max-width: 100%;
   display: flex;
   justify-content: center;
-  transform: scale(1.2);
+  transform: scale(1.15);
   transform-origin: center;
   transition: all 0.2s ease;
 }
 
-.landing-google-cta:hover {
-  transform: scale(1.25);
+@media (hover: hover) and (pointer: fine) {
+  .landing-google-cta:hover {
+    transform: scale(1.22);
+  }
 }
 
 /* GIS가 버튼을 실제로 렌더링하는 자리 */
@@ -92,7 +95,7 @@
 
 /* 정책 링크 강조 */
 .landing-policy-link {
-  color: #374151;
+  color: #2563eb;
   text-decoration: underline;
 }
 
@@ -136,4 +139,62 @@
 
 .site-footer__links a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .landing-main {
+    padding-top: 40px;
+  }
+
+  .landing-content {
+    max-width: 560px;
+    padding: 40px 28px;
+    border-radius: 18px;
+    gap: 12px;
+  }
+
+  .landing-google-cta {
+    margin-top: 28px;
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-main {
+    padding-top: 28px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .landing-content {
+    max-width: 100%;
+    padding: 30px 20px;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  }
+
+  .landing-subtitle {
+    font-size: 15px;
+  }
+
+  .landing-google-cta {
+    width: 100%;
+    margin-top: 24px;
+    transform: scale(1);
+  }
+
+  .landing-policy {
+    margin-top: 14px;
+    font-size: 12px;
+  }
+
+  .site-footer__inner {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .site-footer__links {
+    justify-content: center;
+    width: 100%;
+  }
 }
