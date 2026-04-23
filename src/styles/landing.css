@@ -136,6 +136,7 @@
   max-width: 980px;
   margin: 0 auto;
   padding: 18px 20px;
+  direction: rtl;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -149,6 +150,7 @@
   font-size: 0.9rem;
   direction: ltr;
   unicode-bidi: isolate;
+  text-align: left;
 }
 
 .site-footer__links {

@@ -24,7 +24,7 @@ export default function HomePage() {
           <div className="landing-google-cta">
             {isLoggedIn ? (
               <Link to="/main" className="landing-google-login-btn">
-                메인으로 이동
+                الانتقال إلى الصفحة الرئيسية
               </Link>
             ) : (
               <a href={googleLoginUrl} className="landing-google-login-btn" aria-label="Sign in with Google">
