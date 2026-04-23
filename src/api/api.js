@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearAuthSession, getAccessToken, saveAuthSession } from "../auth/authStorage.js";
 
 /**
  * REST API 호출은 모두 axios 로 통일합니다.
@@ -43,9 +44,61 @@ export const apiClient = axios.create({
   },
 });
 
+let refreshInFlight = null;
+
+apiClient.interceptors.request.use((config) => {
+  const accessToken = getAccessToken();
+  if (accessToken) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const status = error.response?.status;
+    const originalRequest = error.config || {};
+    const url = String(originalRequest.url || "");
+    const isAuthEndpoint = url.includes("/auth/refresh") || url.includes("/auth/logout");
+
+    if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+      originalRequest._retry = true;
+      try {
+        if (!refreshInFlight) {
+          refreshInFlight = apiClient
+            .post("/auth/refresh")
+            .then(({ data }) => {
+              if (!data?.success || !data?.data?.accessToken) {
+                throw new Error(data?.message || "토큰 갱신 실패");
+              }
+              saveAuthSession({
+                accessToken: data.data.accessToken,
+                member: {
+                  memberId: data.data.memberId,
+                  email: data.data.email,
+                  name: data.data.name,
+                  role: data.data.role,
+                },
+              });
+              return data.data.accessToken;
+            })
+            .finally(() => {
+              refreshInFlight = null;
+            });
+        }
+
+        const newAccessToken = await refreshInFlight;
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        clearAuthSession();
+        return Promise.reject(refreshError);
+      }
+    }
+
     const ax = error.response?.data;
     const msg =
       (typeof ax?.message === "string" && ax.message) ||

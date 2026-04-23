@@ -61,21 +61,48 @@
   max-width: 100%;
   display: flex;
   justify-content: center;
-  transform: scale(1.15);
-  transform-origin: center;
-  transition: all 0.2s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .landing-google-cta:hover {
-    transform: scale(1.22);
-  }
 }
 
 /* GIS가 버튼을 실제로 렌더링하는 자리 */
 .landing-google-wrap {
   margin: 0 auto;
   width: 100%;
+}
+
+.landing-google-login-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Roboto, Arial, sans-serif;
+  text-decoration: none;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.landing-google-login-btn:hover {
+  background: #f8f9fa;
+  border-color: #d2e3fc;
+}
+
+.landing-google-login-btn__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-google-login-btn__text {
+  line-height: 1;
 }
 
 /* 설정 누락/스크립트 실패 안내 */
@@ -155,7 +182,6 @@
 
   .landing-google-cta {
     margin-top: 28px;
-    transform: scale(1.05);
   }
 }
 
@@ -180,7 +206,6 @@
   .landing-google-cta {
     width: 100%;
     margin-top: 24px;
-    transform: scale(1);
   }
 
   .landing-policy {

@@ -1,98 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { getAccessToken } from "../auth/authStorage.js";
 import SiteHeader from "../components/SiteHeader.jsx";
 import SiteFooter from "../components/SiteFooter.jsx";
 import "../styles/hero.css";
 import "../styles/landing.css";
 
-// Google Identity Services 스크립트(아랍어 UI 고정)
-const GIS_SCRIPT_SRC = "https://accounts.google.com/gsi/client?hl=ar";
-
 export default function HomePage() {
-  // 버튼 렌더 실패/설정 누락 시 사용자에게 보여줄 안내 메시지
-  const [googleError, setGoogleError] = useState("");
-  // GIS 버튼이 준비됐는지 추적 (추후 prompt 호출 확장 대비)
-  const isGoogleReadyRef = useRef(false);
-
-  // 구글 로그인 성공 시 전달되는 ID 토큰을 받는 콜백
-  function handleCredentialResponse(response) {
-    const idToken = response?.credential;
-    if (!idToken) {
-      setGoogleError("ID 토큰을 받지 못했습니다. 다시 시도해 주세요.");
-      return;
-    }
-    setGoogleError("");
-    console.log(`Encoded JWT ID token: ${idToken}`);
-  }
-
-  useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (!clientId) {
-      setGoogleError("Google 버튼을 표시하려면 VITE_GOOGLE_CLIENT_ID 설정이 필요합니다.");
-      return;
-    }
-
-    let retryTimer;
-    let isCancelled = false;
-
-    // GIS 스크립트가 로드될 때까지 짧게 재시도한 뒤 공식 버튼을 그립니다.
-    const renderGoogleButton = (attempt = 0) => {
-      if (isCancelled) {
-        return;
-      }
-
-      if (!window.google?.accounts?.id) {
-        if (attempt >= 40) {
-          setGoogleError("Google 스크립트 로드에 실패했습니다. 페이지를 새로고침해 주세요.");
-          return;
-        }
-        retryTimer = window.setTimeout(() => renderGoogleButton(attempt + 1), 150);
-        return;
-      }
-
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleCredentialResponse,
-      });
-
-      const container = document.getElementById("googleSignInDiv");
-      if (!container) {
-        return;
-      }
-
-      container.innerHTML = "";
-      window.google.accounts.id.renderButton(container, {
-        theme: "outline",
-        size: "large",
-        type: "standard",
-        text: "continue_with",
-        shape: "rectangular",
-        logo_alignment: "left",
-        locale: "ar",
-        width: 320,
-      });
-      isGoogleReadyRef.current = true;
-      setGoogleError("");
-    };
-
-    // index.html에서 못 불러왔을 때를 대비한 안전 로딩
-    if (!document.querySelector(`script[src="${GIS_SCRIPT_SRC}"]`)) {
-      const script = document.createElement("script");
-      script.src = GIS_SCRIPT_SRC;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-
-    renderGoogleButton();
-
-    return () => {
-      isCancelled = true;
-      isGoogleReadyRef.current = false;
-      if (retryTimer) {
-        window.clearTimeout(retryTimer);
-      }
-    };
-  }, []);
+  const isLoggedIn = Boolean(getAccessToken());
+  const backendBase = import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:8080";
+  const googleLoginUrl = `${backendBase.replace(/\/$/, "")}/oauth2/authorization/google`;
 
   return (
     // 아랍어 사용자 기준 화면 흐름을 위해 RTL 방향 사용
@@ -104,11 +20,38 @@ export default function HomePage() {
             يا أصحابي، أنتم أيضًا تستطيعون التحدث بالكورية!
           </h1>
           <p className="landing-subtitle">ابدأ تعلم اللغة الكورية الآن</p>
-          {/* 공식 GIS 버튼이 그려질 컨테이너 (버튼 자체는 Google이 렌더링) */}
+          {/* 서버 주도 OAuth2 방식: 백엔드 인증 엔드포인트로 이동 */}
           <div className="landing-google-cta">
-            <div id="googleSignInDiv" className="landing-google-wrap" />
+            {isLoggedIn ? (
+              <Link to="/main" className="landing-google-login-btn">
+                메인으로 이동
+              </Link>
+            ) : (
+              <a href={googleLoginUrl} className="landing-google-login-btn" aria-label="Sign in with Google">
+                <span className="landing-google-login-btn__icon" aria-hidden="true">
+                  <svg viewBox="0 0 18 18" width="18" height="18">
+                    <path
+                      fill="#EA4335"
+                      d="M9 7.03v3.2h4.45c-.19 1.03-.78 1.9-1.66 2.49v2.07h2.69c1.58-1.46 2.49-3.61 2.49-6.19 0-.54-.05-1.07-.14-1.57H9z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M9 16.5c2.25 0 4.14-.74 5.52-2.01l-2.69-2.07c-.74.5-1.69.8-2.83.8-2.17 0-4-1.47-4.66-3.44H1.56v2.16A8.34 8.34 0 0 0 9 16.5z"
+                    />
+                    <path
+                      fill="#4A90E2"
+                      d="M4.34 9.78A5 5 0 0 1 4.08 8.2c0-.55.09-1.09.26-1.58V4.46H1.56A8.34 8.34 0 0 0 .66 8.2c0 1.34.32 2.61.9 3.74l2.78-2.16z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M9 3.18c1.23 0 2.33.42 3.2 1.25l2.4-2.4C13.14.67 11.25-.1 9-.1A8.34 8.34 0 0 0 1.56 4.46l2.78 2.16C5 4.65 6.83 3.18 9 3.18z"
+                    />
+                  </svg>
+                </span>
+                <span className="landing-google-login-btn__text">تسجيل الدخول باستخدام Google</span>
+              </a>
+            )}
           </div>
-          {googleError ? <p className="landing-google-error">{googleError}</p> : null}
           <p className="landing-policy">
             بالمتابعة، فإنك توافق على{" "}
             <a href="#" className="landing-policy-link">
