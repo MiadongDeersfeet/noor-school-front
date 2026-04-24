@@ -7,7 +7,7 @@ import "../styles/landing.css";
 
 export default function HomePage() {
   const isLoggedIn = Boolean(getAccessToken());
-  const backendBase = import.meta.env.VITE_BACKEND_BASE_URL || "http://localhost:8080";
+  const backendBase = import.meta.env.VITE_BACKEND_BASE_URL || "";
   const googleLoginUrl = `${backendBase.replace(/\/$/, "")}/oauth2/authorization/google`;
 
   return (
