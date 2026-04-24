@@ -15,7 +15,7 @@ export default function SiteFooter() {
     <footer className="site-footer" role="contentinfo">
       <div className="site-footer__inner">
         <p className="site-footer__copy" lang="en" dir="ltr">
-          © {year} Noor School. All rights reserved.
+          © {year} NoorSchool. All rights reserved.
         </p>
         <nav className="site-footer__links" aria-label="푸터 링크">
           <a href="#">سياسة الخصوصية</a>

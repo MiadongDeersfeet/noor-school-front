@@ -8,25 +8,32 @@ export default function AuthCallbackPage() {
   const [status, setStatus] = useState("처리 중...");
 
   const payload = useMemo(() => {
-    const accessToken = searchParams.get("accessToken");
     const error = searchParams.get("error");
     const message = searchParams.get("message");
+    const isNewMember = searchParams.get("isNewMember") === "true";
+
+    if (isNewMember) {
+      return {
+        isNewMember: true,
+        signupToken: searchParams.get("signupToken"),
+        error,
+        message,
+      };
+    }
+
+    const accessToken = searchParams.get("accessToken");
     const memberId = searchParams.get("memberId");
     const email = searchParams.get("email");
     const name = searchParams.get("name");
     const role = searchParams.get("role");
 
     return {
+      isNewMember: false,
       accessToken,
       error,
       message,
       member: memberId
-        ? {
-            memberId: Number(memberId),
-            email: email ?? "",
-            name: name ?? "",
-            role: role ?? "",
-          }
+        ? { memberId: Number(memberId), email: email ?? "", name: name ?? "", role: role ?? "" }
         : null,
     };
   }, [searchParams]);
@@ -38,16 +45,31 @@ export default function AuthCallbackPage() {
       return;
     }
 
+    // 신규 회원: signupToken만 가지고 약관 동의 페이지로 이동 (세션 저장 없음)
+    if (payload.isNewMember) {
+      if (!payload.signupToken) {
+        clearAuthSession();
+        setStatus("가입 토큰을 받지 못했습니다. 다시 시도해주세요.");
+        return;
+      }
+      setStatus("약관 동의 페이지로 이동합니다...");
+      const timer = window.setTimeout(() => {
+        navigate("/terms/agree", {
+          replace: true,
+          state: { signupToken: payload.signupToken },
+        });
+      }, 400);
+      return () => window.clearTimeout(timer);
+    }
+
+    // 기존 회원: 세션 저장 후 메인으로
     if (!payload.accessToken) {
       clearAuthSession();
       setStatus("로그인 토큰을 받지 못했습니다.");
       return;
     }
 
-    saveAuthSession({
-      accessToken: payload.accessToken,
-      member: payload.member,
-    });
+    saveAuthSession({ accessToken: payload.accessToken, member: payload.member });
     setStatus("로그인 성공! 메인 페이지로 이동합니다.");
     const timer = window.setTimeout(() => {
       navigate("/main", { replace: true });
