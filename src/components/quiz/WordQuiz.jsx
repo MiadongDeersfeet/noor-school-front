@@ -10,6 +10,25 @@ import "../../styles/word-quiz.css";
 /** 보기 버튼 왼쪽에 붙는 번호 라벨 (1·2·3) */
 const CHOICE_LABELS = ["1", "2", "3"];
 
+function buildAudioUrl(path) {
+  if (!path) return null;
+
+  // Already absolute URL
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL || "";
+  if (!baseUrl) {
+    console.warn("VITE_BACKEND_BASE_URL이 설정되지 않았습니다.");
+    return path;
+  }
+
+  const normalizedBase = baseUrl.replace(/\/+$/, "");
+  const normalizedPath = String(path).replace(/^\/+/, "");
+  return `${normalizedBase}/${normalizedPath}`;
+}
+
 /**
  * API 랜덤 퀴즈 한 문항을 UI용 형태로 변환합니다.
  * @param {object} q
@@ -105,12 +124,13 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
   const audioRef = useRef(null);
 
   const playCorrectAudio = useCallback((audioUrl) => {
-    if (!audioUrl) return;
+    const src = buildAudioUrl(audioUrl);
+    if (!src) return;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    const audio = new Audio(audioUrl);
+    const audio = new Audio(src);
     audioRef.current = audio;
     audio.play().catch((err) => {
       console.warn("오디오 재생 실패:", err);
