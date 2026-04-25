@@ -1,142 +1,125 @@
-/* 단어 주제 선택 페이지 · 임시 학습 페이지 공통 레이아웃 */
+.word-topic-beta-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
 
-.word-topic-page {
+.word-topic-beta-page__main {
   flex: 1;
-  background: linear-gradient(160deg, #f1f8e9 0%, #e8f5e9 40%, #fff 100%);
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
   padding: 1.5rem 1.25rem 3rem;
 }
 
-.word-topic-page__inner {
-  max-width: 960px;
-  margin: 0 auto;
+.word-topic-beta-hero {
+  border: 1px solid #e6e9ef;
+  border-radius: 18px;
+  background: #fbfdff;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
-.word-topic-page__crumb {
-  margin: 0 0 1rem;
-  font-size: 0.875rem;
-  color: #546e7a;
-}
-
-.word-topic-page__crumb a {
-  color: #2e7d32;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.word-topic-page__crumb a:hover {
-  text-decoration: underline;
-}
-
-.word-topic-page__crumb-current {
-  color: #37474f;
-  font-weight: 600;
-}
-
-.word-topic-page__title {
+.word-topic-beta-hero__label {
   margin: 0 0 0.5rem;
-  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
-  font-weight: 800;
-  color: #1b5e20;
-  letter-spacing: -0.02em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #276ef1;
+  letter-spacing: 0.08em;
 }
 
-.word-topic-page__lead {
-  margin: 0 0 2rem;
-  font-size: 0.95rem;
-  color: #455a64;
-  line-height: 1.6;
-  max-width: 36em;
+.word-topic-beta-hero h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  color: #0f172a;
 }
 
-/* 반응형 정사각형 타일 그리드 */
-.word-topic-grid {
+.word-topic-beta-hero__desc {
+  margin: 0;
+  color: #475569;
+}
+
+[dir="rtl"] .word-topic-beta-page__main,
+[dir="rtl"] .word-topic-beta-hero,
+[dir="rtl"] .word-topic-beta-card {
+  text-align: right;
+}
+
+.word-topic-beta-hero__actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.word-topic-beta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #ffffff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.word-topic-beta-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.word-topic-beta-btn--ghost {
+  background: #ffffff;
+  color: #1e293b;
+  border-color: #d3d9e3;
+}
+
+.word-topic-beta-btn--ghost:hover {
+  background: #f8fafc;
+}
+
+.word-topic-beta-grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.9rem;
 }
 
-.word-topic-grid__cell {
-  margin: 0;
-}
-
-.word-topic-card {
-  aspect-ratio: 1 / 1;
+.word-topic-beta-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0.75rem;
-  border-radius: 16px;
-  background: #fff;
-  border: 1px solid rgba(46, 125, 50, 0.2);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  gap: 0.45rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  padding: 1rem;
   text-decoration: none;
-  color: inherit;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  transition: transform 0.16s ease;
 }
 
-.word-topic-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(46, 125, 50, 0.15);
-  border-color: rgba(46, 125, 50, 0.45);
+.word-topic-beta-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
 }
 
-.word-topic-card:focus-visible {
-  outline: 3px solid #66bb6a;
-  outline-offset: 2px;
-}
-
-.word-topic-card__title {
-  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
-  font-weight: 800;
-  color: #1b5e20;
-  margin-bottom: 0.35rem;
-}
-
-.word-topic-card__hint {
+.word-topic-beta-card__level {
   font-size: 0.72rem;
-  color: #607d8b;
-  line-height: 1.35;
-  max-width: 11em;
+  color: #64748b;
+  font-weight: 700;
 }
 
-/* 랜덤 퀴즈 — 주제 목록에서 구분 */
-.word-topic-card--random {
-  background: linear-gradient(145deg, #e8f5e9 0%, #fff 55%, #f1f8e9 100%);
-  border-color: rgba(27, 94, 32, 0.35);
+.word-topic-beta-card__title {
+  color: #0f172a;
+  font-size: 1.03rem;
 }
 
-.word-topic-card--random .word-topic-card__title {
-  color: #0d47a1;
-}
-
-/* 임시 학습 페이지 */
-.word-study-placeholder__msg {
-  margin: 0 0 1.5rem;
-  color: #546e7a;
-  font-size: 1rem;
-}
-
-.word-study-placeholder__back {
-  display: inline-block;
-  color: #2e7d32;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.word-study-placeholder__back:hover {
-  text-decoration: underline;
-}
-
-@media (min-width: 640px) {
-  .word-topic-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+.word-topic-beta-card__desc {
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.45;
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getQuestionsForTopic } from "../../data/mockWordQuiz.js";
 import {
@@ -25,6 +25,7 @@ function mapQuizDtoToQuestion(q) {
     arabic: q.question,
     prompt: "이 아랍어에 맞는 한국어는?",
     choices,
+    correctAudioUrl: q.correctAudioUrl ?? null,
   };
 }
 
@@ -101,7 +102,27 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
 
   const question = questions[index];
 
+  const audioRef = useRef(null);
+
+  const playCorrectAudio = useCallback((audioUrl) => {
+    if (!audioUrl) return;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+    audio.play().catch((err) => {
+      console.warn("오디오 재생 실패:", err);
+    });
+  }, []);
+
   const resetQuestionUi = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
     setSelectedId(null);
     setLocked(false);
     setSubmitResult(null);
@@ -116,8 +137,9 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
       if (choiceId === question.correctId) {
         setScore((s) => s + 1);
       }
+      playCorrectAudio(question.correctAudioUrl);
     },
-    [locked, question]
+    [locked, question, playCorrectAudio]
   );
 
   const pickChoiceApi = useCallback(
@@ -140,6 +162,7 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
         if (result.correct) {
           setScore((s) => s + 1);
         }
+        playCorrectAudio(question.correctAudioUrl);
       } catch (e) {
         setSelectedId(null);
         setSubmitError(
@@ -149,7 +172,7 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
         setSubmitting(false);
       }
     },
-    [locked, submitting, question]
+    [locked, submitting, question, playCorrectAudio]
   );
 
   const pickChoice = useCallback(
@@ -443,6 +466,19 @@ export default function WordQuiz({ topicId, topicTitle, mode = "mock" }) {
               {feedbackOk
                 ? "정답이에요! 잘하고 있어요."
                 : "아쉽네요. 초록색이 정답이에요."}
+            </div>
+          )}
+
+          {locked && question.correctAudioUrl && (
+            <div className="word-quiz__audio-row">
+              <button
+                type="button"
+                className="word-quiz__btn-audio"
+                onClick={() => playCorrectAudio(question.correctAudioUrl)}
+                aria-label="정답 발음 다시 듣기"
+              >
+                🔊 다시 듣기
+              </button>
             </div>
           )}
 

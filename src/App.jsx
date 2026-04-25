@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
-import WordTopicPage from "./pages/WordTopicPage.jsx";
 import WordQuizPage from "./pages/WordQuizPage.jsx";
 import AuthCallbackPage from "./pages/AuthCallbackPage.jsx";
 import MainPage from "./pages/MainPage.jsx";
 import TermsAgreementPage from "./pages/TermsAgreementPage.jsx";
+import WordTopicPage from "./pages/WordTopicPage.jsx";
 
 /**
  * 앱의 라우팅 허브입니다.
